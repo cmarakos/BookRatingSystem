@@ -14,12 +14,12 @@ public class BookSearchResponse {
     List<Book> books;
 
     @JsonProperty("books")
-    public List<Book> getResults() {
+    public List<Book> getBooks() {
         return books;
     }
 
     @JsonProperty("results")
-    public void setResults(List<Book> books) {
+    public void setBooks(List<Book> books) {
         this.books = books;
     }
 }

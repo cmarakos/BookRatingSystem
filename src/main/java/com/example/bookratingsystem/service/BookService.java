@@ -5,6 +5,7 @@ import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.Book;
 import com.example.bookratingsystem.model.dto.BookReview;
 import com.example.bookratingsystem.model.dto.BookSearchResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,15 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BookService {
 
     private final ReviewService reviewService;
     private final RestTemplate restTemplate;
-
-    public BookService(ReviewService reviewService) {
-        this.reviewService = reviewService;
-        this.restTemplate = new RestTemplate();
-    }
 
     // Search for books by title using the Gutendex API
     public BookSearchResponse searchBooks(String title) {
