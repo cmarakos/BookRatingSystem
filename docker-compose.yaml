@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  book-rating-system:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/bookratings
+    volumes:
+      - ./data:/data
+    networks:
+      - book-network
+networks:
+  book-network:
+    driver: bridge
+

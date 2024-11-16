@@ -1,0 +1,21 @@
+### Search for Books by Title
+GET http://localhost:8080/api/books/search?title=Pride and Prejudice
+Content-Type: application/json
+
+###
+
+### Add a Review for a Book
+POST http://localhost:8080/api/books/review
+Content-Type: application/json
+
+{
+  "bookId": 1342,
+  "rating": 4,
+  "reviewText": "A wonderful and timeless story."
+}
+
+###
+
+### Get Book Details with Reviews and Average Rating
+GET http://localhost:8080/api/books/1342
+Content-Type: application/json
