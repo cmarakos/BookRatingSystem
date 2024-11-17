@@ -2,6 +2,7 @@ package com.example.bookratingsystem.controller;
 
 import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.Book;
+import com.example.bookratingsystem.model.dto.BookRatingResponse;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
 import jakarta.validation.Valid;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
@@ -38,5 +41,12 @@ public class BookController {
     public ResponseEntity<?> getBookDetails(@PathVariable int bookId) {
         return ResponseEntity.ok(bookService.getBookDetails(bookId));
     }
+
+
+    @GetMapping("/top")
+    public ResponseEntity<List<BookRatingResponse>> getTopBooks(@RequestParam int n) {
+        return ResponseEntity.ok(bookService.getTopBooks(n));
+    }
+
 }
 

@@ -5,6 +5,7 @@ import com.example.bookratingsystem.controller.BookController;
 import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.Author;
 import com.example.bookratingsystem.model.dto.Book;
+import com.example.bookratingsystem.model.dto.BookRatingResponse;
 import com.example.bookratingsystem.model.dto.BookReview;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
@@ -91,4 +92,24 @@ public class BookControllerTest {
     assertEquals(200, response.getStatusCodeValue());
     assertEquals(mockedBookReview, response.getBody());
   }
+
+    @Test
+    void testGetTopBooksEndpoint_Success() throws Exception {
+        // Arrange
+        int n = 2;
+
+        List<BookRatingResponse> topBooks = List.of(
+                new BookRatingResponse("Book One", 4.5),
+                new BookRatingResponse("Book Two", 4.2)
+        );
+
+        when(bookService.getTopBooks(n)).thenReturn(topBooks);
+
+        ResponseEntity<?> response = bookController.getTopBooks(n);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(topBooks, response.getBody());
+
+        verify(bookService, times(1)).getTopBooks(n);
+    }
+
 }

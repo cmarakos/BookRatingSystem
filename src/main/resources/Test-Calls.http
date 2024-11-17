@@ -24,3 +24,7 @@ Content-Type: application/json
 ### Get Book Details with Reviews and Average Rating
 GET http://localhost:8080/api/books/27556
 Content-Type: application/json
+
+### Get Top N Books by avg Rating
+GET http://localhost:8080/api/books/top?n=3
+Content-Type: application/json

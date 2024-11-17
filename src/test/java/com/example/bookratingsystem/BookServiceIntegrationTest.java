@@ -153,4 +153,5 @@ class BookServiceIntegrationTest {
         verify(integrationService, times(1)).fetchBookDetails(bookId);
         verify(reviewService, times(1)).getReviewsByBookId(bookId);
     }
+
 }

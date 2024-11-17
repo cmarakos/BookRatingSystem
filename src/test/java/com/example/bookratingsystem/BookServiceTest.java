@@ -1,9 +1,7 @@
 package com.example.bookratingsystem;
 
 import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.Author;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookReview;
+import com.example.bookratingsystem.model.dto.*;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.IntegrationService;
 import com.example.bookratingsystem.service.ReviewService;
@@ -143,4 +141,38 @@ class BookServiceTest {
         verify(integrationService, times(1)).fetchBookDetails(bookId);
         verify(reviewService, times(1)).getReviewsByBookId(bookId);
     }
+
+    @Test
+    void testGetTopBooks_Success() {
+        // Arrange
+        int n = 2;
+
+        // Mock top book IDs and their ratings
+        List<BookIdRating> topBookIds = List.of(
+                new BookIdRating(1, 4.5),
+                new BookIdRating(2, 4.2)
+        );
+
+        when(reviewService.getTopNBookId(n)).thenReturn(topBookIds);
+
+        // Mock book details for each book ID
+        when(integrationService.fetchBookDetails(1)).thenReturn(new Book(1, "Book One", null, List.of("en"), 123));
+        when(integrationService.fetchBookDetails(2)).thenReturn(new Book(2, "Book Two", null, List.of("en"), 456));
+
+        // Act
+        List<BookRatingResponse> result = bookService.getTopBooks(n);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Book One", result.get(0).getBookName());
+        assertEquals(4.5, result.get(0).getRating());
+        assertEquals("Book Two", result.get(1).getBookName());
+        assertEquals(4.2, result.get(1).getRating());
+
+        verify(reviewService, times(1)).getTopNBookId(n);
+        verify(integrationService, times(1)).fetchBookDetails(1);
+        verify(integrationService, times(1)).fetchBookDetails(2);
+    }
+
 }

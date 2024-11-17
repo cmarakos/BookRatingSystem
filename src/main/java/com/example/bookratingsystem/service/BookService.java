@@ -1,14 +1,12 @@
 package com.example.bookratingsystem.service;
 
-import com.example.bookratingsystem.constant.Constant;
 import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.Book;
+import com.example.bookratingsystem.model.dto.BookIdRating;
+import com.example.bookratingsystem.model.dto.BookRatingResponse;
 import com.example.bookratingsystem.model.dto.BookReview;
-import com.example.bookratingsystem.model.dto.BookSearchResponse;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -58,22 +56,28 @@ public class BookService {
         );
     }
 
-    @Cacheable(value = "bookSearchResponse", key = "#title")
-    public List<Book> fetchPaginatedResponse(String title) {
-        log.info("Fetching books with title : {}", title);
-        String url = Constant.GUTENDEX_API_URL + title;
-        List<Book> bookList = new ArrayList<>();
+    public List<BookRatingResponse> getTopBooks(int n) {
+        log.info("Fetching top {} books based on average rating.", n);
 
-        while (StringUtils.isNotBlank(url)) {
-            BookSearchResponse response = restTemplate.getForObject(url, BookSearchResponse.class);
-            if (response == null || response.getBooks() == null) {
-                throw new RuntimeException("Book not found in Gutendex API.");
-            }
-            bookList.addAll(response.getBooks());
-            url = response.getNext(); // Update URL for the next page, or null if no more results
-        }
+        // Step 1: Fetch top N book IDs from the repository
+        List<BookIdRating> bookIdRatings = reviewService.getTopNBookId(n);
 
-        return bookList;
+        // Step 2: Fetch book details for each book ID
+        List<BookRatingResponse> topBooks = new ArrayList<>();
+
+        bookIdRatings.forEach(
+                record -> {
+                    Book bookDetails = integrationService.fetchBookDetails(record.getBookId());
+                    topBooks.add(
+                            BookRatingResponse.builder()
+                                    .bookName(bookDetails.getTitle())
+                                    .rating(record.getRating())
+                                    .build()
+                    );
+                }
+        );
+
+        return topBooks;
     }
 
     private Page<Book> paginate(Pageable pageable, List<Book> bookList) {

@@ -1,6 +1,7 @@
 package com.example.bookratingsystem.service;
 
 import com.example.bookratingsystem.model.Review;
+import com.example.bookratingsystem.model.dto.BookIdRating;
 import com.example.bookratingsystem.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,11 @@ public class ReviewService {
     // Retrieve all reviews for a specific book by its ID
     public List<Review> getReviewsByBookId(int bookId) {
         return reviewRepository.findByBookId(bookId);
+    }
+
+    public List<BookIdRating> getTopNBookId(int n) {
+        return reviewRepository.findTopBooksByAverageRating(n);
+
     }
 }
 
