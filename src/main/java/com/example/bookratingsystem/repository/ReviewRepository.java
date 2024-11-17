@@ -16,7 +16,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     List<ReviewEntity> findByBookId(int bookId);
 
     @Query("""
-                SELECT new com.example.bookratingsystem.model.dto.BookIdRating(r.bookId, AVG(r.rating))
+                SELECT new com.example.bookratingsystem.model.dto.BookIdRatingDto(r.bookId, AVG(r.rating))
                 FROM ReviewEntity r
                 GROUP BY r.bookId
                 ORDER BY AVG(r.rating) DESC
@@ -24,7 +24,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
     List<BookIdRatingDto> findTopBooksByAverageRating(@Param("n") int n);
 
     @Query("""
-                SELECT new com.example.bookratingsystem.model.dto.MonthlyAverageRating(
+                SELECT new com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto(
                     YEAR(r.createdAt),
                     MONTH(r.createdAt),
                     AVG(r.rating)
