@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Author {
+public class AuthorDto {
 
     String name;
     Integer birthYear;

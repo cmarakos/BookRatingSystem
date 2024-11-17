@@ -1,8 +1,9 @@
 package com.example.bookratingsystem;
 
-import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.BookIdRating;
-import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
+import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.dto.BookIdRatingDto;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
+import com.example.bookratingsystem.model.dto.ReviewDto;
 import com.example.bookratingsystem.repository.ReviewRepository;
 import com.example.bookratingsystem.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-public class ReviewServiceTest {
+public class ReviewDtoServiceTest {
 
   @Mock
   private ReviewRepository reviewRepository;
@@ -35,39 +36,40 @@ public class ReviewServiceTest {
 
   @Test
   public void testAddReview() {
-    Review review = new Review(1L, 1342, 4, "A wonderful and timeless story.", null);
-    when(reviewRepository.save(any(Review.class))).thenReturn(review);
+    ReviewEntity reviewEntity = new ReviewEntity(1L, 1342, 4, "A wonderful and timeless story.", null);
+    ReviewDto reviewDto = new ReviewDto(1342, 4, "A wonderful and timeless story.");
+    when(reviewRepository.save(any(ReviewEntity.class))).thenReturn(reviewEntity);
 
-    Review response = reviewService.addReview(review);
+    ReviewEntity response = reviewService.addReview(reviewDto);
 
-    assertEquals(review.getReviewText(), response.getReviewText());
+    assertEquals(reviewEntity.getReviewText(), response.getReviewText());
   }
 
   @Test
   public void testGetReviewsByBookId() {
     int bookId = 1342;
-    List<Review> mockReviews = Collections.singletonList(new Review(1L, bookId, 4, "A wonderful and timeless story.", null));
-    when(reviewRepository.findByBookId(bookId)).thenReturn(mockReviews);
+    List<ReviewEntity> mockReviewEntities = Collections.singletonList(new ReviewEntity(1L, bookId, 4, "A wonderful and timeless story.", null));
+    when(reviewRepository.findByBookId(bookId)).thenReturn(mockReviewEntities);
 
-    List<Review> response = reviewService.getReviewsByBookId(bookId);
+    List<ReviewEntity> response = reviewService.getReviewsByBookId(bookId);
 
-    assertEquals(mockReviews, response);
+    assertEquals(mockReviewEntities, response);
   }
 
   @Test
   void testGetTopNBookId_Success() {
     // Arrange
     int n = 3;
-    List<BookIdRating> mockResults = List.of(
-            new BookIdRating(84, 4.8),
-            new BookIdRating(2701, 4.5),
-            new BookIdRating(1513, 4.2)
+    List<BookIdRatingDto> mockResults = List.of(
+            new BookIdRatingDto(84, 4.8),
+            new BookIdRatingDto(2701, 4.5),
+            new BookIdRatingDto(1513, 4.2)
     );
 
     when(reviewRepository.findTopBooksByAverageRating(n)).thenReturn(mockResults);
 
     // Act
-    List<BookIdRating> results = reviewService.getTopNBookId(n);
+    List<BookIdRatingDto> results = reviewService.getTopNBookId(n);
 
     // Assert
     assertNotNull(results);
@@ -84,15 +86,15 @@ public class ReviewServiceTest {
   void testFindAverageRatingPerMonth_Success() {
     // Arrange
     Integer bookId = 84;
-    List<MonthlyAverageRating> mockResults = List.of(
-            new MonthlyAverageRating(2023, 1, 4.5),
-            new MonthlyAverageRating(2023, 12, 3.8)
+    List<MonthlyAverageRatingDto> mockResults = List.of(
+            new MonthlyAverageRatingDto(2023, 1, 4.5),
+            new MonthlyAverageRatingDto(2023, 12, 3.8)
     );
 
     when(reviewRepository.findAverageRatingPerMonth(bookId)).thenReturn(mockResults);
 
     // Act
-    List<MonthlyAverageRating> results = reviewService.findAverageRatingPerMonth(bookId);
+    List<MonthlyAverageRatingDto> results = reviewService.findAverageRatingPerMonth(bookId);
 
     // Assert
     assertNotNull(results);

@@ -1,12 +1,15 @@
 package com.example.bookratingsystem.model.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class BookIdRating {
-    Integer bookId;
+@NoArgsConstructor
+@Builder
+public class BookRatingDto {
+    String bookName;
     Double rating;
 }

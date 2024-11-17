@@ -1,8 +1,8 @@
 package com.example.bookratingsystem;
 
-import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookReview;
+import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.dto.BookDto;
+import com.example.bookratingsystem.model.dto.BookReviewDto;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.IntegrationService;
 import com.example.bookratingsystem.service.ReviewService;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class BookServiceIntegrationTest {
+class BookDtoServiceIntegrationTest {
 
     @Autowired
     private BookService bookService;
@@ -41,14 +41,14 @@ class BookServiceIntegrationTest {
         // Arrange
         String title = "Test";
         Pageable pageable = PageRequest.of(0, 10);
-        List<Book> books = List.of(
-                new Book(1, "Test Book", null, List.of("en"), 150)
+        List<BookDto> bookDtos = List.of(
+                new BookDto(1, "Test Book", null, List.of("en"), 150)
         );
 
-        when(integrationService.fetchBookSearchResponse(title)).thenReturn(books);
+        when(integrationService.fetchBookSearchResponse(title)).thenReturn(bookDtos);
 
         // Act
-        Page<Book> result = bookService.searchBooks(title, pageable);
+        Page<BookDto> result = bookService.searchBooks(title, pageable);
 
         // Assert
         assertNotNull(result);
@@ -62,15 +62,15 @@ class BookServiceIntegrationTest {
         // Arrange
         String title = "Test";
         Pageable pageable = PageRequest.of(0, 2);
-        List<Book> books = List.of(
-                new Book(1, "Book 1", null, List.of("en"), 100),
-                new Book(2, "Book 2", null, List.of("en"), 200)
+        List<BookDto> bookDtos = List.of(
+                new BookDto(1, "Book 1", null, List.of("en"), 100),
+                new BookDto(2, "Book 2", null, List.of("en"), 200)
         );
 
-        when(integrationService.fetchBookSearchResponse(title)).thenReturn(books);
+        when(integrationService.fetchBookSearchResponse(title)).thenReturn(bookDtos);
 
         // Act
-        Page<Book> result = bookService.searchBooks(title, pageable);
+        Page<BookDto> result = bookService.searchBooks(title, pageable);
 
         // Assert
         assertNotNull(result);
@@ -98,17 +98,17 @@ class BookServiceIntegrationTest {
     void testGetBookDetails_Success() {
         // Arrange
         int bookId = 1;
-        Book mockBook = new Book(bookId, "Test Book", null, List.of("en"), 150);
-        List<Review> mockReviews = List.of(
-                new Review(1L, bookId, 5, "Great book", null),
-                new Review(2L, bookId, 4, "Enjoyable read", null)
+        BookDto mockBookDto = new BookDto(bookId, "Test Book", null, List.of("en"), 150);
+        List<ReviewEntity> mockReviewEntities = List.of(
+                new ReviewEntity(1L, bookId, 5, "Great book", null),
+                new ReviewEntity(2L, bookId, 4, "Enjoyable read", null)
         );
 
-        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
-        when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviews);
+        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBookDto);
+        when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviewEntities);
 
         // Act
-        BookReview result = bookService.getBookDetails(bookId);
+        BookReviewDto result = bookService.getBookDetails(bookId);
 
         // Assert
         assertNotNull(result);
@@ -137,13 +137,13 @@ class BookServiceIntegrationTest {
     void testGetBookDetails_NoReviews() {
         // Arrange
         int bookId = 1;
-        Book mockBook = new Book(bookId, "Test Book", null, List.of("en"), 150);
+        BookDto mockBookDto = new BookDto(bookId, "Test Book", null, List.of("en"), 150);
 
-        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
+        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBookDto);
         when(reviewService.getReviewsByBookId(bookId)).thenReturn(List.of());
 
         // Act
-        BookReview result = bookService.getBookDetails(bookId);
+        BookReviewDto result = bookService.getBookDetails(bookId);
 
         // Assert
         assertNotNull(result);

@@ -1,4 +1,4 @@
-CREATE TABLE review
+CREATE TABLE reviewDtoEntity
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     book_id     INT NOT NULL,

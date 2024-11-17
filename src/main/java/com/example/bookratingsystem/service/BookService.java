@@ -1,6 +1,6 @@
 package com.example.bookratingsystem.service;
 
-import com.example.bookratingsystem.model.Review;
+import com.example.bookratingsystem.model.ReviewEntity;
 import com.example.bookratingsystem.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,49 +25,49 @@ public class BookService {
     private final RestTemplate restTemplate;
 
     // Search for books by title using the Gutendex API
-    public Page<Book> searchBooks(String title, Pageable pageable) {
+    public Page<BookDto> searchBooks(String title, Pageable pageable) {
 
-        List<Book> books = integrationService.fetchBookSearchResponse(title);
+        List<BookDto> bookDtos = integrationService.fetchBookSearchResponse(title);
 
-        return paginate(pageable, books);
+        return paginate(pageable, bookDtos);
     }
 
     // Fetch book details by book ID, along with aggregated reviews and average rating
-    public BookReview getBookDetails(int bookId) {
+    public BookReviewDto getBookDetails(int bookId) {
         // Fetch book details from Gutendex API
-        Book bookDetails = integrationService.fetchBookDetails(bookId);
+        BookDto bookDtoDetails = integrationService.fetchBookDetails(bookId);
 
         // Retrieve reviews from local database
-        List<Review> reviews = reviewService.getReviewsByBookId(bookId);
+        List<ReviewEntity> reviewEntities = reviewService.getReviewsByBookId(bookId);
 
         // Calculate average rating
-        OptionalDouble averageRating = reviews.stream()
-                .mapToInt(Review::getRating)
+        OptionalDouble averageRating = reviewEntities.stream()
+                .mapToInt(ReviewEntity::getRating)
                 .average();
 
         // Prepare response with Gutendex data and review data
-        return new BookReview(
-                bookDetails,
+        return new BookReviewDto(
+                bookDtoDetails,
                 averageRating.isPresent() ? averageRating.getAsDouble() : null,
-                reviews.stream().map(Review::getReviewText).collect(Collectors.toList())
+                reviewEntities.stream().map(ReviewEntity::getReviewText).collect(Collectors.toList())
         );
     }
 
-    public List<BookRatingResponse> getTopBooks(int n) {
+    public List<BookRatingDto> getTopBooks(int n) {
         log.info("Fetching top {} books based on average rating.", n);
 
         // Step 1: Fetch top N book IDs from the repository
-        List<BookIdRating> bookIdRatings = reviewService.getTopNBookId(n);
+        List<BookIdRatingDto> bookIdRatingDtos = reviewService.getTopNBookId(n);
 
         // Step 2: Fetch book details for each book ID
-        List<BookRatingResponse> topBooks = new ArrayList<>();
+        List<BookRatingDto> topBooks = new ArrayList<>();
 
-        bookIdRatings.forEach(
+        bookIdRatingDtos.forEach(
                 record -> {
-                    Book bookDetails = integrationService.fetchBookDetails(record.getBookId());
+                    BookDto bookDtoDetails = integrationService.fetchBookDetails(record.getBookId());
                     topBooks.add(
-                            BookRatingResponse.builder()
-                                    .bookName(bookDetails.getTitle())
+                            BookRatingDto.builder()
+                                    .bookName(bookDtoDetails.getTitle())
                                     .rating(record.getRating())
                                     .build()
                     );
@@ -77,12 +77,12 @@ public class BookService {
         return topBooks;
     }
 
-    public List<MonthlyAverageRating> getAverageRatingPerMonth(Integer bookId) {
+    public List<MonthlyAverageRatingDto> getAverageRatingPerMonth(Integer bookId) {
         log.info("Fetching monthly average rating for bookId: {}", bookId);
         return reviewService.findAverageRatingPerMonth(bookId);
     }
 
-    private Page<Book> paginate(Pageable pageable, List<Book> bookList) {
+    private Page<BookDto> paginate(Pageable pageable, List<BookDto> bookDtoList) {
         // Validate page and size
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
@@ -94,14 +94,14 @@ public class BookService {
         }
 
         // Calculate start and end indices for the page
-        int start = Math.min(pageNumber * pageSize, bookList.size());
-        int end = Math.min(start + pageSize, bookList.size());
+        int start = Math.min(pageNumber * pageSize, bookDtoList.size());
+        int end = Math.min(start + pageSize, bookDtoList.size());
 
         // Create sublist for the requested page
-        List<Book> paginatedBooks = bookList.subList(start, end);
+        List<BookDto> paginatedBookDtos = bookDtoList.subList(start, end);
 
         // Return the paginated response as a PageImpl object
-        return new PageImpl<>(paginatedBooks, pageable, bookList.size());
+        return new PageImpl<>(paginatedBookDtos, pageable, bookDtoList.size());
     }
 }
 

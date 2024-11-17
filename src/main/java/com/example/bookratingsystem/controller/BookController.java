@@ -1,9 +1,9 @@
 package com.example.bookratingsystem.controller;
 
-import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookRatingResponse;
-import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
+import com.example.bookratingsystem.model.dto.BookDto;
+import com.example.bookratingsystem.model.dto.BookRatingDto;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
+import com.example.bookratingsystem.model.dto.ReviewDto;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
 import jakarta.validation.Valid;
@@ -27,15 +27,15 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Book>> searchBooks(
+    public ResponseEntity<Page<BookDto>> searchBooks(
             @RequestParam String title,
             Pageable pageable) {
         return ResponseEntity.ok(bookService.searchBooks(title, pageable));
     }
 
     @PostMapping("/review")
-    public ResponseEntity<?> addReview(@Valid @RequestBody Review review) {
-        return ResponseEntity.ok(reviewService.addReview(review));
+    public ResponseEntity<?> addReview(@Valid @RequestBody ReviewDto reviewDto) {
+        return ResponseEntity.ok(reviewService.addReview(reviewDto));
     }
 
     @GetMapping("/{bookId}")
@@ -45,13 +45,13 @@ public class BookController {
 
 
     @GetMapping("/top")
-    public ResponseEntity<List<BookRatingResponse>> getTopBooks(@RequestParam int n) {
+    public ResponseEntity<List<BookRatingDto>> getTopBooks(@RequestParam int n) {
         return ResponseEntity.ok(bookService.getTopBooks(n));
     }
 
     @GetMapping("/{bookId}/average-rating-per-month")
-    public ResponseEntity<List<MonthlyAverageRating>> getAverageRatingPerMonth(@PathVariable Integer bookId) {
-        List<MonthlyAverageRating> averages = bookService.getAverageRatingPerMonth(bookId);
+    public ResponseEntity<List<MonthlyAverageRatingDto>> getAverageRatingPerMonth(@PathVariable Integer bookId) {
+        List<MonthlyAverageRatingDto> averages = bookService.getAverageRatingPerMonth(bookId);
         return ResponseEntity.ok(averages);
     }
 

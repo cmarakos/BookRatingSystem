@@ -2,8 +2,8 @@ package com.example.bookratingsystem.service;
 
 
 import com.example.bookratingsystem.constant.Constant;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookSearchResponse;
+import com.example.bookratingsystem.model.dto.BookDto;
+import com.example.bookratingsystem.model.dto.BookSearchDto;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,21 +29,21 @@ public class IntegrationService {
      * @return the BookSearchResponse containing the search results.
      */
     @Cacheable(value = "bookSearchResponse", key = "#title")
-    public List<Book> fetchBookSearchResponse(String title) {
+    public List<BookDto> fetchBookSearchResponse(String title) {
         log.info("Fetching books with title : {}", title);
         String url = Constant.GUTENDEX_API_URL + title;
-        List<Book> bookList = new ArrayList<>();
+        List<BookDto> bookDtoList = new ArrayList<>();
 
         while (StringUtils.isNotBlank(url)) {
-            BookSearchResponse response = restTemplate.getForObject(url, BookSearchResponse.class);
-            if (response == null || response.getBooks() == null) {
+            BookSearchDto response = restTemplate.getForObject(url, BookSearchDto.class);
+            if (response == null || response.getBookDtos() == null) {
                 throw new RuntimeException("Book not found in Gutendex API.");
             }
-            bookList.addAll(response.getBooks());
+            bookDtoList.addAll(response.getBookDtos());
             url = response.getNext(); // Update URL for the next page, or null if no more results
         }
 
-        return bookList;
+        return bookDtoList;
     }
 
     /**
@@ -54,14 +54,14 @@ public class IntegrationService {
      * @return the Book details.
      */
     @Cacheable(value = "bookDetails", key = "#bookId")
-    public Book fetchBookDetails(int bookId) {
+    public BookDto fetchBookDetails(int bookId) {
         log.info("Fetching book details for bookId: {}", bookId);
         String url = Constant.GUTENDEX_BOOK_DETAILS_URL + bookId;
-        Book book = restTemplate.getForObject(url, Book.class);
-        if (book == null) {
+        BookDto bookDto = restTemplate.getForObject(url, BookDto.class);
+        if (bookDto == null) {
             throw new RuntimeException("Book not found for ID: " + bookId);
         }
-        return book;
+        return bookDto;
     }
 }
 

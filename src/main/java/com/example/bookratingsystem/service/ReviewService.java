@@ -1,8 +1,9 @@
 package com.example.bookratingsystem.service;
 
-import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.BookIdRating;
-import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
+import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.dto.BookIdRatingDto;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
+import com.example.bookratingsystem.model.dto.ReviewDto;
 import com.example.bookratingsystem.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,21 +19,26 @@ public class ReviewService {
     }
 
     // Add a new review and rating for a specific book
-    public Review addReview(Review review) {
-        return reviewRepository.save(review);
+    public ReviewEntity addReview(ReviewDto reviewDto) {
+        return reviewRepository.save(
+                ReviewEntity.builder()
+                        .bookId(reviewDto.getBookId())
+                        .reviewText(reviewDto.getReviewText())
+                        .rating(reviewDto.getRating())
+                        .build());
     }
 
     // Retrieve all reviews for a specific book by its ID
-    public List<Review> getReviewsByBookId(int bookId) {
+    public List<ReviewEntity> getReviewsByBookId(int bookId) {
         return reviewRepository.findByBookId(bookId);
     }
 
-    public List<BookIdRating> getTopNBookId(int n) {
+    public List<BookIdRatingDto> getTopNBookId(int n) {
         return reviewRepository.findTopBooksByAverageRating(n);
 
     }
 
-    public List<MonthlyAverageRating> findAverageRatingPerMonth(Integer bookId) {
+    public List<MonthlyAverageRatingDto> findAverageRatingPerMonth(Integer bookId) {
         return reviewRepository.findAverageRatingPerMonth(bookId);
     }
 }

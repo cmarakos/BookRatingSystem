@@ -1,6 +1,5 @@
-package com.example.bookratingsystem.model;
+package com.example.bookratingsystem.model.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -9,18 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Review {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class ReviewDto {
     @NotNull
     private int bookId;
 
@@ -30,14 +21,4 @@ public class Review {
 
     @Size(max = 3000)
     private String reviewText;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, updatable = false)
-    private Date createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = new Date();
-    }
-
 }

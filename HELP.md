@@ -2,8 +2,8 @@
 
 ## Overview
 
-This project is a simple REST API for searching and rating books using the Gutendex API and a local H2 database for
-storing ratings and reviews.
+This project is a simple REST API for searching and rating bookDtos using the Gutendex API and a local H2 database for
+storing ratings and reviewEntities.
 
 ## Running the Application
 

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MonthlyAverageRating {
+public class MonthlyAverageRatingDto {
     private Integer year;
     private Integer month;
     private Double averageRating;

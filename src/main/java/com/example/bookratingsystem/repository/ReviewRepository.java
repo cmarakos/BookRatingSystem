@@ -1,8 +1,8 @@
 package com.example.bookratingsystem.repository;
 
-import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.BookIdRating;
-import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
+import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.dto.BookIdRatingDto;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,17 +11,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
 
-    List<Review> findByBookId(int bookId);
+    List<ReviewEntity> findByBookId(int bookId);
 
     @Query("""
                 SELECT new com.example.bookratingsystem.model.dto.BookIdRating(r.bookId, AVG(r.rating))
-                FROM Review r
+                FROM ReviewEntity r
                 GROUP BY r.bookId
                 ORDER BY AVG(r.rating) DESC
             """)
-    List<BookIdRating> findTopBooksByAverageRating(@Param("n") int n);
+    List<BookIdRatingDto> findTopBooksByAverageRating(@Param("n") int n);
 
     @Query("""
                 SELECT new com.example.bookratingsystem.model.dto.MonthlyAverageRating(
@@ -29,12 +29,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                     MONTH(r.createdAt),
                     AVG(r.rating)
                 )
-                FROM Review r
+                FROM ReviewEntity r
                 WHERE r.bookId = :bookId
                 GROUP BY YEAR(r.createdAt), MONTH(r.createdAt)
                 ORDER BY YEAR(r.createdAt), MONTH(r.createdAt)
             """)
-    List<MonthlyAverageRating> findAverageRatingPerMonth(@Param("bookId") Integer bookId);
+    List<MonthlyAverageRatingDto> findAverageRatingPerMonth(@Param("bookId") Integer bookId);
 
 }
 

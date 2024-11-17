@@ -2,11 +2,8 @@ package com.example.bookratingsystem;
 
 
 import com.example.bookratingsystem.controller.BookController;
-import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.Author;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookRatingResponse;
-import com.example.bookratingsystem.model.dto.BookReview;
+import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.dto.*;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
-public class BookControllerTest {
+public class BookDtoControllerTest {
 
   @Mock
   private BookService bookService;
@@ -49,9 +46,9 @@ public class BookControllerTest {
         // Arrange
         String title = "Pride and Prejudice";
         Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
-        Book mockBook = new Book(1, "MockBook1", List.of(new Author()), List.of("en"), 10);
-        Book mockBook2 = new Book(2, "MockBook2", List.of(new Author()), List.of("en"), 10);
-        Page<Book> mockedPage = new PageImpl<>(List.of(mockBook, mockBook2), pageable, 2);
+        BookDto mockBookDto = new BookDto(1, "MockBook1", List.of(new AuthorDto()), List.of("en"), 10);
+        BookDto mockBookDto2 = new BookDto(2, "MockBook2", List.of(new AuthorDto()), List.of("en"), 10);
+        Page<BookDto> mockedPage = new PageImpl<>(List.of(mockBookDto, mockBookDto2), pageable, 2);
 
         when(bookService.searchBooks(title, pageable)).thenReturn(mockedPage);
 
@@ -67,24 +64,24 @@ public class BookControllerTest {
 
   @Test
   public void testAddReview() {
-    Review review = new Review();
-    review.setBookId(1342);
-    review.setRating(4);
-    review.setReviewText("A wonderful and timeless story.");
-    Review mockedReview = new Review();
-    when(reviewService.addReview(any(Review.class))).thenReturn(mockedReview);
+      ReviewDto reviewDtoEntity = new ReviewDto();
+      reviewDtoEntity.setBookId(1342);
+      reviewDtoEntity.setRating(4);
+      reviewDtoEntity.setReviewText("A wonderful and timeless story.");
+      ReviewEntity mockedReviewEntity = new ReviewEntity();
+      when(reviewService.addReview(any(ReviewDto.class))).thenReturn(mockedReviewEntity);
 
-    ResponseEntity<?> response = bookController.addReview(review);
+      ResponseEntity<?> response = bookController.addReview(reviewDtoEntity);
 
     assertEquals(200, response.getStatusCodeValue());
-    assertEquals(mockedReview, response.getBody());
+      assertEquals(mockedReviewEntity, response.getBody());
   }
 
   @Test
   public void testGetBookDetails() {
     int bookId = 1342;
-    Book mockBook = new Book();
-    BookReview mockedBookReview = new BookReview(mockBook, 4.5, Collections.singletonList("A wonderful and timeless story."));
+      BookDto mockBookDto = new BookDto();
+      BookReviewDto mockedBookReview = new BookReviewDto(mockBookDto, 4.5, Collections.singletonList("A wonderful and timeless story."));
     when(bookService.getBookDetails(bookId)).thenReturn(mockedBookReview);
 
     ResponseEntity<?> response = bookController.getBookDetails(bookId);
@@ -98,9 +95,9 @@ public class BookControllerTest {
         // Arrange
         int n = 2;
 
-        List<BookRatingResponse> topBooks = List.of(
-                new BookRatingResponse("Book One", 4.5),
-                new BookRatingResponse("Book Two", 4.2)
+        List<BookRatingDto> topBooks = List.of(
+                new BookRatingDto("Book One", 4.5),
+                new BookRatingDto("Book Two", 4.2)
         );
 
         when(bookService.getTopBooks(n)).thenReturn(topBooks);

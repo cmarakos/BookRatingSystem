@@ -12,10 +12,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Book {
+public class BookDto {
     int id;
     String title;
-    List<Author> authors;
+    List<AuthorDto> authorDtos;
     List<String> languages;
     int downloadCount;
 

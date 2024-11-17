@@ -13,19 +13,19 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class BookSearchResponse {
+public class BookSearchDto {
 
     String next;
-    List<Book> books;
+    List<BookDto> bookDtos;
 
     @JsonProperty("books")
-    public List<Book> getBooks() {
-        return books;
+    public List<BookDto> getBookDtos() {
+        return bookDtos;
     }
 
     @JsonProperty("results")
-    public void setBooks(List<Book> books) {
-        this.books = books;
+    public void setBookDtos(List<BookDto> bookDtos) {
+        this.bookDtos = bookDtos;
     }
 
 }

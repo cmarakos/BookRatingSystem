@@ -1,8 +1,8 @@
 package com.example.bookratingsystem;
 
 import com.example.bookratingsystem.constant.Constant;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookSearchResponse;
+import com.example.bookratingsystem.model.dto.BookDto;
+import com.example.bookratingsystem.model.dto.BookSearchDto;
 import com.example.bookratingsystem.service.IntegrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,23 +35,23 @@ class IntegrationServiceTest {
         String title = "Java";
         String url = Constant.GUTENDEX_API_URL + title;
 
-        BookSearchResponse mockResponse = new BookSearchResponse();
-        mockResponse.setBooks(List.of(
-                new Book(1, "Java Basics", null, List.of("en"), 100),
-                new Book(2, "Advanced Java", null, List.of("en"), 200)
+        BookSearchDto mockResponse = new BookSearchDto();
+        mockResponse.setBookDtos(List.of(
+                new BookDto(1, "Java Basics", null, List.of("en"), 100),
+                new BookDto(2, "Advanced Java", null, List.of("en"), 200)
         ));
         mockResponse.setNext(null);
 
-        when(restTemplate.getForObject(url, BookSearchResponse.class)).thenReturn(mockResponse);
+        when(restTemplate.getForObject(url, BookSearchDto.class)).thenReturn(mockResponse);
 
         // Act
-        List<Book> books = integrationService.fetchBookSearchResponse(title);
+        List<BookDto> bookDtos = integrationService.fetchBookSearchResponse(title);
 
         // Assert
-        assertNotNull(books);
-        assertEquals(2, books.size());
-        assertEquals("Java Basics", books.get(0).getTitle());
-        verify(restTemplate, times(1)).getForObject(url, BookSearchResponse.class);
+        assertNotNull(bookDtos);
+        assertEquals(2, bookDtos.size());
+        assertEquals("Java Basics", bookDtos.get(0).getTitle());
+        verify(restTemplate, times(1)).getForObject(url, BookSearchDto.class);
     }
 
     @Test
@@ -61,27 +61,27 @@ class IntegrationServiceTest {
         String page1Url = Constant.GUTENDEX_API_URL + title;
         String page2Url = Constant.GUTENDEX_API_URL + title + "&page=2";
 
-        BookSearchResponse page1Response = new BookSearchResponse();
-        page1Response.setBooks(List.of(new Book(1, "Java Basics", null, List.of("en"), 100)));
+        BookSearchDto page1Response = new BookSearchDto();
+        page1Response.setBookDtos(List.of(new BookDto(1, "Java Basics", null, List.of("en"), 100)));
         page1Response.setNext(page2Url);
 
-        BookSearchResponse page2Response = new BookSearchResponse();
-        page2Response.setBooks(List.of(new Book(2, "Advanced Java", null, List.of("en"), 200)));
+        BookSearchDto page2Response = new BookSearchDto();
+        page2Response.setBookDtos(List.of(new BookDto(2, "Advanced Java", null, List.of("en"), 200)));
         page2Response.setNext(null);
 
-        when(restTemplate.getForObject(page1Url, BookSearchResponse.class)).thenReturn(page1Response);
-        when(restTemplate.getForObject(page2Url, BookSearchResponse.class)).thenReturn(page2Response);
+        when(restTemplate.getForObject(page1Url, BookSearchDto.class)).thenReturn(page1Response);
+        when(restTemplate.getForObject(page2Url, BookSearchDto.class)).thenReturn(page2Response);
 
         // Act
-        List<Book> books = integrationService.fetchBookSearchResponse(title);
+        List<BookDto> bookDtos = integrationService.fetchBookSearchResponse(title);
 
         // Assert
-        assertNotNull(books);
-        assertEquals(2, books.size());
-        assertEquals("Java Basics", books.get(0).getTitle());
-        assertEquals("Advanced Java", books.get(1).getTitle());
-        verify(restTemplate, times(1)).getForObject(page1Url, BookSearchResponse.class);
-        verify(restTemplate, times(1)).getForObject(page2Url, BookSearchResponse.class);
+        assertNotNull(bookDtos);
+        assertEquals(2, bookDtos.size());
+        assertEquals("Java Basics", bookDtos.get(0).getTitle());
+        assertEquals("Advanced Java", bookDtos.get(1).getTitle());
+        verify(restTemplate, times(1)).getForObject(page1Url, BookSearchDto.class);
+        verify(restTemplate, times(1)).getForObject(page2Url, BookSearchDto.class);
     }
 
     @Test
@@ -90,13 +90,13 @@ class IntegrationServiceTest {
         String title = "NonExistentBook";
         String url = Constant.GUTENDEX_API_URL + title;
 
-        when(restTemplate.getForObject(url, BookSearchResponse.class)).thenReturn(null);
+        when(restTemplate.getForObject(url, BookSearchDto.class)).thenReturn(null);
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> integrationService.fetchBookSearchResponse(title));
         assertEquals("Book not found in Gutendex API.", exception.getMessage());
-        verify(restTemplate, times(1)).getForObject(url, BookSearchResponse.class);
+        verify(restTemplate, times(1)).getForObject(url, BookSearchDto.class);
     }
 
     @Test
@@ -105,17 +105,17 @@ class IntegrationServiceTest {
         int bookId = 1;
         String url = Constant.GUTENDEX_BOOK_DETAILS_URL + bookId;
 
-        Book mockBook = new Book(bookId, "Test Book", null, List.of("en"), 150);
-        when(restTemplate.getForObject(url, Book.class)).thenReturn(mockBook);
+        BookDto mockBookDto = new BookDto(bookId, "Test Book", null, List.of("en"), 150);
+        when(restTemplate.getForObject(url, BookDto.class)).thenReturn(mockBookDto);
 
         // Act
-        Book result = integrationService.fetchBookDetails(bookId);
+        BookDto result = integrationService.fetchBookDetails(bookId);
 
         // Assert
         assertNotNull(result);
         assertEquals("Test Book", result.getTitle());
         assertEquals(150, result.getDownloadCount());
-        verify(restTemplate, times(1)).getForObject(url, Book.class);
+        verify(restTemplate, times(1)).getForObject(url, BookDto.class);
     }
 
     @Test
@@ -124,13 +124,13 @@ class IntegrationServiceTest {
         int bookId = 999;
         String url = Constant.GUTENDEX_BOOK_DETAILS_URL + bookId;
 
-        when(restTemplate.getForObject(url, Book.class)).thenReturn(null);
+        when(restTemplate.getForObject(url, BookDto.class)).thenReturn(null);
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> integrationService.fetchBookDetails(bookId));
         assertEquals("Book not found for ID: " + bookId, exception.getMessage());
-        verify(restTemplate, times(1)).getForObject(url, Book.class);
+        verify(restTemplate, times(1)).getForObject(url, BookDto.class);
     }
 }
 

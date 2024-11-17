@@ -1,6 +1,6 @@
 package com.example.bookratingsystem;
 
-import com.example.bookratingsystem.model.Review;
+import com.example.bookratingsystem.model.ReviewEntity;
 import com.example.bookratingsystem.model.dto.*;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.IntegrationService;
@@ -21,7 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class BookServiceTest {
+class BookDtoServiceTest {
 
     @Mock
     private ReviewService reviewService;
@@ -42,14 +42,14 @@ class BookServiceTest {
         // Arrange
         String title = "Java";
         Pageable pageable = PageRequest.of(0, 10);
-        List<Book> books = new ArrayList<>();
-        books.add(new Book(1, "Java Programming", List.of(new Author("Author 1", 1950, null)), List.of("en"), 12345));
-        books.add(new Book(2, "Advanced Java", List.of(new Author("Author 2", 1970, null)), List.of("en"), 54321));
+        List<BookDto> bookDtos = new ArrayList<>();
+        bookDtos.add(new BookDto(1, "Java Programming", List.of(new AuthorDto("Author 1", 1950, null)), List.of("en"), 12345));
+        bookDtos.add(new BookDto(2, "Advanced Java", List.of(new AuthorDto("Author 2", 1970, null)), List.of("en"), 54321));
 
-        when(integrationService.fetchBookSearchResponse(title)).thenReturn(books);
+        when(integrationService.fetchBookSearchResponse(title)).thenReturn(bookDtos);
 
         // Act
-        Page<Book> result = bookService.searchBooks(title, pageable);
+        Page<BookDto> result = bookService.searchBooks(title, pageable);
 
         // Assert
         assertNotNull(result);
@@ -64,16 +64,16 @@ class BookServiceTest {
         // Arrange
         String title = "Java";
         Pageable pageable = PageRequest.of(1, 2); // Page 1 (second page), size 2
-        List<Book> books = List.of(
-                new Book(1, "Java Basics", List.of(new Author("Author 1", 1950, null)), List.of("en"), 1000),
-                new Book(2, "Java Intermediate", List.of(new Author("Author 2", 1970, null)), List.of("en"), 2000),
-                new Book(3, "Java Advanced", List.of(new Author("Author 3", 1980, null)), List.of("en"), 3000)
+        List<BookDto> bookDtos = List.of(
+                new BookDto(1, "Java Basics", List.of(new AuthorDto("Author 1", 1950, null)), List.of("en"), 1000),
+                new BookDto(2, "Java Intermediate", List.of(new AuthorDto("Author 2", 1970, null)), List.of("en"), 2000),
+                new BookDto(3, "Java Advanced", List.of(new AuthorDto("Author 3", 1980, null)), List.of("en"), 3000)
         );
 
-        when(integrationService.fetchBookSearchResponse(title)).thenReturn(books);
+        when(integrationService.fetchBookSearchResponse(title)).thenReturn(bookDtos);
 
         // Act
-        Page<Book> result = bookService.searchBooks(title, pageable);
+        Page<BookDto> result = bookService.searchBooks(title, pageable);
 
         // Assert
         assertNotNull(result);
@@ -88,18 +88,18 @@ class BookServiceTest {
         // Arrange
         int bookId = 1;
 
-        Book mockBook = new Book(1, "Java Programming", List.of(new Author()), List.of("en"), 99999);
-        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
+        BookDto mockBookDto = new BookDto(1, "Java Programming", List.of(new AuthorDto()), List.of("en"), 99999);
+        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBookDto);
 
-        List<Review> mockReviews = List.of(new Review(1L, bookId, 5, "Great book!", null));
-        when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviews);
+        List<ReviewEntity> mockReviewEntities = List.of(new ReviewEntity(1L, bookId, 5, "Great book!", null));
+        when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviewEntities);
 
         // Act
-        BookReview result = bookService.getBookDetails(bookId);
+        BookReviewDto result = bookService.getBookDetails(bookId);
 
         // Assert
         assertNotNull(result);
-        assertEquals(mockBook.getId(), result.getId());
+        assertEquals(mockBookDto.getId(), result.getId());
         assertEquals(1, result.getReviews().size());
         assertEquals(5.0, result.getRating());
         verify(integrationService, times(1)).fetchBookDetails(bookId);
@@ -125,17 +125,17 @@ class BookServiceTest {
         // Arrange
         int bookId = 1;
 
-        Book mockBook = new Book(1, "Java Programming", List.of(new Author()), List.of("en"), 99999);
-        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
+        BookDto mockBookDto = new BookDto(1, "Java Programming", List.of(new AuthorDto()), List.of("en"), 99999);
+        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBookDto);
 
         when(reviewService.getReviewsByBookId(bookId)).thenReturn(Collections.emptyList());
 
         // Act
-        BookReview result = bookService.getBookDetails(bookId);
+        BookReviewDto result = bookService.getBookDetails(bookId);
 
         // Assert
         assertNotNull(result);
-        assertEquals(mockBook.getId(), result.getId());
+        assertEquals(mockBookDto.getId(), result.getId());
         assertNull(result.getRating());
         assertTrue(result.getReviews().isEmpty());
         verify(integrationService, times(1)).fetchBookDetails(bookId);
@@ -148,19 +148,19 @@ class BookServiceTest {
         int n = 2;
 
         // Mock top book IDs and their ratings
-        List<BookIdRating> topBookIds = List.of(
-                new BookIdRating(1, 4.5),
-                new BookIdRating(2, 4.2)
+        List<BookIdRatingDto> topBookIds = List.of(
+                new BookIdRatingDto(1, 4.5),
+                new BookIdRatingDto(2, 4.2)
         );
 
         when(reviewService.getTopNBookId(n)).thenReturn(topBookIds);
 
         // Mock book details for each book ID
-        when(integrationService.fetchBookDetails(1)).thenReturn(new Book(1, "Book One", null, List.of("en"), 123));
-        when(integrationService.fetchBookDetails(2)).thenReturn(new Book(2, "Book Two", null, List.of("en"), 456));
+        when(integrationService.fetchBookDetails(1)).thenReturn(new BookDto(1, "Book One", null, List.of("en"), 123));
+        when(integrationService.fetchBookDetails(2)).thenReturn(new BookDto(2, "Book Two", null, List.of("en"), 456));
 
         // Act
-        List<BookRatingResponse> result = bookService.getTopBooks(n);
+        List<BookRatingDto> result = bookService.getTopBooks(n);
 
         // Assert
         assertNotNull(result);
