@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class BookDtoServiceIntegrationTest {
+class BookServiceIntegrationTest {
 
     @Autowired
     private BookService bookService;

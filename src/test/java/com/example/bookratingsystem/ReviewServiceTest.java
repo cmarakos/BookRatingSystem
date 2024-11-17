@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-public class ReviewDtoServiceTest {
+public class ReviewServiceTest {
 
   @Mock
   private ReviewRepository reviewRepository;

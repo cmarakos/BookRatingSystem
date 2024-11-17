@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
-public class BookDtoControllerTest {
+public class BookControllerTest {
 
   @Mock
   private BookService bookService;
