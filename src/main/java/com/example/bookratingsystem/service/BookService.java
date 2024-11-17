@@ -8,6 +8,7 @@ import com.example.bookratingsystem.model.dto.BookSearchResponse;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,23 +26,21 @@ import java.util.stream.Collectors;
 public class BookService {
 
     private final ReviewService reviewService;
+    private final IntegrationService integrationService;
     private final RestTemplate restTemplate;
 
     // Search for books by title using the Gutendex API
     public Page<Book> searchBooks(String title, Pageable pageable) {
 
-        return fetchPaginatedResponse(title, pageable);
+        List<Book> books = integrationService.fetchBookSearchResponse(title);
+
+        return paginate(pageable, books);
     }
 
     // Fetch book details by book ID, along with aggregated reviews and average rating
     public BookReview getBookDetails(int bookId) {
         // Fetch book details from Gutendex API
-        String url = Constant.GUTENDEX_BOOK_DETAILS_URL + bookId;
-        Book bookDetails = restTemplate.getForObject(url, Book.class);
-
-        if (bookDetails == null) {
-            throw new RuntimeException("Book not found in Gutendex API.");
-        }
+        Book bookDetails = integrationService.fetchBookDetails(bookId);
 
         // Retrieve reviews from local database
         List<Review> reviews = reviewService.getReviewsByBookId(bookId);
@@ -59,7 +58,9 @@ public class BookService {
         );
     }
 
-    private Page<Book> fetchPaginatedResponse(String title, Pageable pageable) {
+    @Cacheable(value = "bookSearchResponse", key = "#title")
+    public List<Book> fetchPaginatedResponse(String title) {
+        log.info("Fetching books with title : {}", title);
         String url = Constant.GUTENDEX_API_URL + title;
         List<Book> bookList = new ArrayList<>();
 
@@ -72,7 +73,7 @@ public class BookService {
             url = response.getNext(); // Update URL for the next page, or null if no more results
         }
 
-        return paginate(pageable, bookList);
+        return bookList;
     }
 
     private Page<Book> paginate(Pageable pageable, List<Book> bookList) {

@@ -5,7 +5,7 @@ Content-Type: application/json
 ###
 
 ### Search Books with Pagination
-GET http://localhost:8080/api/books/search?title=Java&page=1&size=2
+GET http://localhost:8080/api/books/search?title=Java&page=0&size=2
 Content-Type: application/json
 
 
@@ -14,13 +14,13 @@ POST http://localhost:8080/api/books/review
 Content-Type: application/json
 
 {
-  "bookId": 1342,
+  "bookId": 27556,
   "rating": 4,
-  "reviewText": "A wonderful and timeless story."
+  "reviewText": "A magnificent and timeless story."
 }
 
 ###
 
 ### Get Book Details with Reviews and Average Rating
-GET http://localhost:8080/api/books/1342
+GET http://localhost:8080/api/books/27556
 Content-Type: application/json

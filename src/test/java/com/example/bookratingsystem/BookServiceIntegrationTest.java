@@ -1,27 +1,24 @@
 package com.example.bookratingsystem;
 
 import com.example.bookratingsystem.model.Review;
+import com.example.bookratingsystem.model.dto.Book;
 import com.example.bookratingsystem.model.dto.BookReview;
 import com.example.bookratingsystem.service.BookService;
+import com.example.bookratingsystem.service.IntegrationService;
 import com.example.bookratingsystem.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class BookServiceIntegrationTest {
@@ -29,159 +26,131 @@ class BookServiceIntegrationTest {
     @Autowired
     private BookService bookService;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    private MockRestServiceServer mockServer;
+    @MockBean
+    private IntegrationService integrationService;
 
     @MockBean
     private ReviewService reviewService;
 
     @BeforeEach
     void setup() {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
     void testSearchBooks_Success() {
-        // Mock API response
-        String apiResponse = """
-            {
-                "results": [
-                    {
-                        "id": 1,
-                        "title": "Test Book",
-                        "authors": [{"name": "Author Name", "birth_year": 1970, "death_year": null}],
-                        "languages": ["en"],
-                        "download_count": 150
-                    }
-                        ],
-                        "next": null
-            }
-        """;
+        // Arrange
+        String title = "Test";
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Book> books = List.of(
+                new Book(1, "Test Book", null, List.of("en"), 150)
+        );
 
-        mockServer.expect(requestTo("https://gutendex.com/books?search=Test"))
-                .andRespond(withSuccess(apiResponse, MediaType.APPLICATION_JSON));
+        when(integrationService.fetchBookSearchResponse(title)).thenReturn(books);
 
-        // Call the service method
-        var result = bookService.searchBooks("Test", org.springframework.data.domain.PageRequest.of(0, 10));
+        // Act
+        Page<Book> result = bookService.searchBooks(title, pageable);
 
-        // Verify the response
+        // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
         assertEquals("Test Book", result.getContent().get(0).getTitle());
+        verify(integrationService, times(1)).fetchBookSearchResponse(title);
     }
 
     @Test
     void testSearchBooks_Pagination_MultiplePages() {
-        // Mock API responses for multiple pages
-        String page1Response = """
-                    {
-                        "results": [
-                            {
-                                "id": 1,
-                                "title": "Book 1",
-                                "authors": [{"name": "Author 1", "birth_year": 1970, "death_year": null}],
-                                "languages": ["en"],
-                                "download_count": 100
-                            }
-                        ],
-                        "next": "https://gutendex.com/books?search=Test&page=2"
-                    }
-                """;
+        // Arrange
+        String title = "Test";
+        Pageable pageable = PageRequest.of(0, 2);
+        List<Book> books = List.of(
+                new Book(1, "Book 1", null, List.of("en"), 100),
+                new Book(2, "Book 2", null, List.of("en"), 200)
+        );
 
-        String page2Response = """
-                    {
-                        "results": [
-                            {
-                                "id": 2,
-                                "title": "Book 2",
-                                "authors": [{"name": "Author 2", "birth_year": 1980, "death_year": null}],
-                                "languages": ["en"],
-                                "download_count": 200
-                            }
-                        ],
-                        "next": null
-                    }
-                """;
+        when(integrationService.fetchBookSearchResponse(title)).thenReturn(books);
 
-        mockServer.expect(requestTo("https://gutendex.com/books?search=Test"))
-                .andRespond(withSuccess(page1Response, MediaType.APPLICATION_JSON));
+        // Act
+        Page<Book> result = bookService.searchBooks(title, pageable);
 
-        mockServer.expect(requestTo("https://gutendex.com/books?search=Test&page=2"))
-                .andRespond(withSuccess(page2Response, MediaType.APPLICATION_JSON));
-
-        // Call the service method
-        var result = bookService.searchBooks("Test", org.springframework.data.domain.PageRequest.of(0, 2));
-
-        // Verify the response
+        // Assert
         assertNotNull(result);
-        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
         assertEquals("Book 1", result.getContent().get(0).getTitle());
         assertEquals("Book 2", result.getContent().get(1).getTitle());
+        verify(integrationService, times(1)).fetchBookSearchResponse(title);
     }
 
     @Test
     void testSearchBooks_NotFound() {
-        // Mock 404 response
-        mockServer.expect(requestTo("https://gutendex.com/books?search=InvalidBook"))
-                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+        // Arrange
+        String title = "InvalidBook";
+        when(integrationService.fetchBookSearchResponse(title))
+                .thenThrow(new RuntimeException("No books found"));
 
-        // Expect an exception
-        assertThrows(HttpClientErrorException.NotFound.class, () -> bookService.searchBooks("InvalidBook", org.springframework.data.domain.PageRequest.of(0, 10)));
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> bookService.searchBooks(title, PageRequest.of(0, 10)));
+        assertEquals("No books found", exception.getMessage());
+        verify(integrationService, times(1)).fetchBookSearchResponse(title);
     }
 
     @Test
     void testGetBookDetails_Success() {
-        // Mock book details response
-        String bookDetailsResponse = """
-            {
-                "id": 1,
-                "title": "Test Book",
-                "authors": [{"name": "Author Name", "birth_year": 1970, "death_year": null}],
-                "languages": ["en"],
-                "download_count": 150
-            }
-        """;
-
-        // Mock reviews from the review service
+        // Arrange
+        int bookId = 1;
+        Book mockBook = new Book(bookId, "Test Book", null, List.of("en"), 150);
         List<Review> mockReviews = List.of(
-                new Review(1L, 1, 5, "Great book"),
-                new Review(2L, 1, 4, "Enjoyable read")
+                new Review(1L, bookId, 5, "Great book"),
+                new Review(2L, bookId, 4, "Enjoyable read")
         );
 
-        when(reviewService.getReviewsByBookId(1)).thenReturn(mockReviews);
+        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
+        when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviews);
 
-        mockServer.expect(requestTo("https://gutendex.com/books/1"))
-                .andRespond(withSuccess(bookDetailsResponse, MediaType.APPLICATION_JSON));
+        // Act
+        BookReview result = bookService.getBookDetails(bookId);
 
-        // Call the service method
-        BookReview bookReview = bookService.getBookDetails(1);
-
-        // Verify the response
-        assertNotNull(bookReview);
-        assertEquals("Test Book", bookReview.getTitle());
-        assertEquals(4.5, bookReview.getRating());
-        assertEquals(2, bookReview.getReviews().size());
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Book", result.getTitle());
+        assertEquals(4.5, result.getRating());
+        assertEquals(2, result.getReviews().size());
+        verify(integrationService, times(1)).fetchBookDetails(bookId);
+        verify(reviewService, times(1)).getReviewsByBookId(bookId);
     }
 
     @Test
     void testGetBookDetails_NotFound() {
-        // Mock 404 response
-        mockServer.expect(requestTo("https://gutendex.com/books/1"))
-                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+        // Arrange
+        int bookId = 1;
+        when(integrationService.fetchBookDetails(bookId))
+                .thenThrow(new RuntimeException("Book not found"));
 
-        // Expect an exception
-        assertThrows(HttpClientErrorException.NotFound.class, () -> bookService.getBookDetails(1));
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> bookService.getBookDetails(bookId));
+        assertEquals("Book not found", exception.getMessage());
+        verify(integrationService, times(1)).fetchBookDetails(bookId);
+        verifyNoInteractions(reviewService);
     }
 
     @Test
-    void testGetBookDetails_InternalServerError() {
-        // Mock 500 response
-        mockServer.expect(requestTo("https://gutendex.com/books/1"))
-                .andRespond(withServerError());
+    void testGetBookDetails_NoReviews() {
+        // Arrange
+        int bookId = 1;
+        Book mockBook = new Book(bookId, "Test Book", null, List.of("en"), 150);
 
-        // Expect an exception
-        assertThrows(HttpServerErrorException.InternalServerError.class, () -> bookService.getBookDetails(1));
+        when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
+        when(reviewService.getReviewsByBookId(bookId)).thenReturn(List.of());
+
+        // Act
+        BookReview result = bookService.getBookDetails(bookId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Book", result.getTitle());
+        assertNull(result.getRating());
+        assertTrue(result.getReviews().isEmpty());
+        verify(integrationService, times(1)).fetchBookDetails(bookId);
+        verify(reviewService, times(1)).getReviewsByBookId(bookId);
     }
 }
