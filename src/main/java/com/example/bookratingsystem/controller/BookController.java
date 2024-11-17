@@ -1,8 +1,12 @@
 package com.example.bookratingsystem.controller;
 
 import com.example.bookratingsystem.model.Review;
+import com.example.bookratingsystem.model.dto.Book;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +23,14 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchBooks(@RequestParam String title) {
-        return ResponseEntity.ok(bookService.searchBooks(title));
+    public ResponseEntity<Page<Book>> searchBooks(
+            @RequestParam String title,
+            Pageable pageable) {
+        return ResponseEntity.ok(bookService.searchBooks(title, pageable));
     }
 
     @PostMapping("/review")
-    public ResponseEntity<?> addReview(@RequestBody Review review) {
+    public ResponseEntity<?> addReview(@Valid @RequestBody Review review) {
         return ResponseEntity.ok(reviewService.addReview(review));
     }
 

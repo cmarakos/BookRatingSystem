@@ -4,6 +4,11 @@ Content-Type: application/json
 
 ###
 
+### Search Books with Pagination
+GET http://localhost:8080/api/books/search?title=Java&page=1&size=2
+Content-Type: application/json
+
+
 ### Add a Review for a Book
 POST http://localhost:8080/api/books/review
 Content-Type: application/json
