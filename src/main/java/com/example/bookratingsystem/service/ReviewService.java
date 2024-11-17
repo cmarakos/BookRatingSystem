@@ -2,6 +2,7 @@ package com.example.bookratingsystem.service;
 
 import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.BookIdRating;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
 import com.example.bookratingsystem.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,10 @@ public class ReviewService {
     public List<BookIdRating> getTopNBookId(int n) {
         return reviewRepository.findTopBooksByAverageRating(n);
 
+    }
+
+    public List<MonthlyAverageRating> findAverageRatingPerMonth(Integer bookId) {
+        return reviewRepository.findAverageRatingPerMonth(bookId);
     }
 }
 

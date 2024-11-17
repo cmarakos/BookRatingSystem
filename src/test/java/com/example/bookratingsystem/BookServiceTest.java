@@ -91,7 +91,7 @@ class BookServiceTest {
         Book mockBook = new Book(1, "Java Programming", List.of(new Author()), List.of("en"), 99999);
         when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
 
-        List<Review> mockReviews = List.of(new Review(1L, bookId, 5, "Great book!"));
+        List<Review> mockReviews = List.of(new Review(1L, bookId, 5, "Great book!", null));
         when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviews);
 
         // Act

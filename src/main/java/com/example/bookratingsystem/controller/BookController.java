@@ -3,6 +3,7 @@ package com.example.bookratingsystem.controller;
 import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.Book;
 import com.example.bookratingsystem.model.dto.BookRatingResponse;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
 import jakarta.validation.Valid;
@@ -46,6 +47,12 @@ public class BookController {
     @GetMapping("/top")
     public ResponseEntity<List<BookRatingResponse>> getTopBooks(@RequestParam int n) {
         return ResponseEntity.ok(bookService.getTopBooks(n));
+    }
+
+    @GetMapping("/{bookId}/average-rating-per-month")
+    public ResponseEntity<List<MonthlyAverageRating>> getAverageRatingPerMonth(@PathVariable Integer bookId) {
+        List<MonthlyAverageRating> averages = bookService.getAverageRatingPerMonth(bookId);
+        return ResponseEntity.ok(averages);
     }
 
 }

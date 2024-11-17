@@ -2,6 +2,7 @@ package com.example.bookratingsystem.repository;
 
 import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.BookIdRating;
+import com.example.bookratingsystem.model.dto.MonthlyAverageRating;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,5 +22,20 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                 ORDER BY AVG(r.rating) DESC
             """)
     List<BookIdRating> findTopBooksByAverageRating(@Param("n") int n);
+
+    @Query("""
+                SELECT new com.example.bookratingsystem.model.dto.MonthlyAverageRating(
+                    YEAR(r.createdAt),
+                    MONTH(r.createdAt),
+                    AVG(r.rating)
+                )
+                FROM Review r
+                WHERE r.bookId = :bookId
+                GROUP BY YEAR(r.createdAt), MONTH(r.createdAt)
+                ORDER BY YEAR(r.createdAt), MONTH(r.createdAt)
+            """)
+    List<MonthlyAverageRating> findAverageRatingPerMonth(@Param("bookId") Integer bookId);
+
 }
+
 

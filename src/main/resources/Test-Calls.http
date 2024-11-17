@@ -1,9 +1,3 @@
-### Search for Books by Title
-GET http://localhost:8080/api/books/search?title=Pride and Prejudice
-Content-Type: application/json
-
-###
-
 ### Search Books with Pagination
 GET http://localhost:8080/api/books/search?title=Java&page=0&size=2
 Content-Type: application/json
@@ -28,3 +22,11 @@ Content-Type: application/json
 ### Get Top N Books by avg Rating
 GET http://localhost:8080/api/books/top?n=3
 Content-Type: application/json
+
+###
+
+### Get Top N Books by avg Rating
+GET http://localhost:8080/api/books/85/average-rating-per-month
+Content-Type: application/json
+
+###

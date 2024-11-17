@@ -15,3 +15,9 @@ INSERT INTO review (book_id, rating, review_text)
 VALUES (1513, 5, 'Absolutely brilliant!'),
        (1513, 4, 'Enjoyed every moment of it.'),
        (1513, 5, 'One of the best books I have read.');
+
+INSERT INTO review (book_id, rating, review_text, created_at)
+VALUES (85, 5, 'Great book!', '2023-01-15 10:00:00'),
+       (85, 4, 'Enjoyable read.', '2023-01-20 15:30:00'),
+       (85, 3, 'Could be better.', '2023-12-05 09:45:00'),
+       (85, 4, 'Good book.', '2023-12-10 11:20:00');

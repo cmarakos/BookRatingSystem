@@ -1,10 +1,7 @@
 package com.example.bookratingsystem.service;
 
 import com.example.bookratingsystem.model.Review;
-import com.example.bookratingsystem.model.dto.Book;
-import com.example.bookratingsystem.model.dto.BookIdRating;
-import com.example.bookratingsystem.model.dto.BookRatingResponse;
-import com.example.bookratingsystem.model.dto.BookReview;
+import com.example.bookratingsystem.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -78,6 +75,11 @@ public class BookService {
         );
 
         return topBooks;
+    }
+
+    public List<MonthlyAverageRating> getAverageRatingPerMonth(Integer bookId) {
+        log.info("Fetching monthly average rating for bookId: {}", bookId);
+        return reviewService.findAverageRatingPerMonth(bookId);
     }
 
     private Page<Book> paginate(Pageable pageable, List<Book> bookList) {

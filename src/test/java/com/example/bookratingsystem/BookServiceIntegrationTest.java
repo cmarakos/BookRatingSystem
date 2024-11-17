@@ -100,8 +100,8 @@ class BookServiceIntegrationTest {
         int bookId = 1;
         Book mockBook = new Book(bookId, "Test Book", null, List.of("en"), 150);
         List<Review> mockReviews = List.of(
-                new Review(1L, bookId, 5, "Great book"),
-                new Review(2L, bookId, 4, "Enjoyable read")
+                new Review(1L, bookId, 5, "Great book", null),
+                new Review(2L, bookId, 4, "Enjoyable read", null)
         );
 
         when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBook);
