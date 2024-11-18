@@ -1,6 +1,6 @@
 package com.example.bookratingsystem;
 
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.*;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.IntegrationService;
@@ -91,7 +91,7 @@ class BookServiceTest {
         BookDto mockBookDto = new BookDto(1, "Java Programming", List.of(new AuthorDto()), List.of("en"), 99999);
         when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBookDto);
 
-        List<ReviewEntity> mockReviewEntities = List.of(new ReviewEntity(1L, bookId, 5, "Great book!", null));
+        List<Review> mockReviewEntities = List.of(new Review(1L, bookId, 5, "Great book!", null));
         when(reviewService.getReviewsByBookId(bookId)).thenReturn(mockReviewEntities);
 
         // Act

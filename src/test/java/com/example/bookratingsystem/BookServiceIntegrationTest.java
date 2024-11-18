@@ -1,6 +1,6 @@
 package com.example.bookratingsystem;
 
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.BookDto;
 import com.example.bookratingsystem.model.dto.BookReviewDto;
 import com.example.bookratingsystem.service.BookService;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@Import(TestDatabaseConfig.class)
 class BookServiceIntegrationTest {
 
     @Autowired
@@ -99,9 +101,9 @@ class BookServiceIntegrationTest {
         // Arrange
         int bookId = 1;
         BookDto mockBookDto = new BookDto(bookId, "Test Book", null, List.of("en"), 150);
-        List<ReviewEntity> mockReviewEntities = List.of(
-                new ReviewEntity(1L, bookId, 5, "Great book", null),
-                new ReviewEntity(2L, bookId, 4, "Enjoyable read", null)
+        List<Review> mockReviewEntities = List.of(
+                new Review(1L, bookId, 5, "Great book", null),
+                new Review(2L, bookId, 4, "Enjoyable read", null)
         );
 
         when(integrationService.fetchBookDetails(bookId)).thenReturn(mockBookDto);

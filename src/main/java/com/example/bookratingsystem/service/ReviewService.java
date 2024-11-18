@@ -1,6 +1,6 @@
 package com.example.bookratingsystem.service;
 
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.BookIdRatingDto;
 import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
 import com.example.bookratingsystem.model.dto.ReviewDto;
@@ -19,9 +19,9 @@ public class ReviewService {
     }
 
     // Add a new review and rating for a specific book
-    public ReviewEntity addReview(ReviewDto reviewDto) {
+    public Review addReview(ReviewDto reviewDto) {
         return reviewRepository.save(
-                ReviewEntity.builder()
+                Review.builder()
                         .bookId(reviewDto.getBookId())
                         .reviewText(reviewDto.getReviewText())
                         .rating(reviewDto.getRating())
@@ -29,7 +29,7 @@ public class ReviewService {
     }
 
     // Retrieve all reviews for a specific book by its ID
-    public List<ReviewEntity> getReviewsByBookId(int bookId) {
+    public List<Review> getReviewsByBookId(int bookId) {
         return reviewRepository.findByBookId(bookId);
     }
 

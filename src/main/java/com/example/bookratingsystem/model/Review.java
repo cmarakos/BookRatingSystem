@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ReviewEntity {
+public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

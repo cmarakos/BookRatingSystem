@@ -1,6 +1,6 @@
 package com.example.bookratingsystem.repository;
 
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.BookIdRatingDto;
 import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,13 +11,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    List<ReviewEntity> findByBookId(int bookId);
+    List<Review> findByBookId(int bookId);
 
     @Query("""
                 SELECT new com.example.bookratingsystem.model.dto.BookIdRatingDto(r.bookId, AVG(r.rating))
-                FROM ReviewEntity r
+                FROM Review r
                 GROUP BY r.bookId
                 ORDER BY AVG(r.rating) DESC
             """)
@@ -29,7 +29,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
                     MONTH(r.createdAt),
                     AVG(r.rating)
                 )
-                FROM ReviewEntity r
+                FROM Review r
                 WHERE r.bookId = :bookId
                 GROUP BY YEAR(r.createdAt), MONTH(r.createdAt)
                 ORDER BY YEAR(r.createdAt), MONTH(r.createdAt)

@@ -1,4 +1,4 @@
-CREATE TABLE reviewDtoEntity
+CREATE TABLE IF NOT EXISTS review
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     book_id     INT NOT NULL,

@@ -1,6 +1,6 @@
 package com.example.bookratingsystem.service;
 
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,18 +38,18 @@ public class BookService {
         BookDto bookDtoDetails = integrationService.fetchBookDetails(bookId);
 
         // Retrieve reviews from local database
-        List<ReviewEntity> reviewEntities = reviewService.getReviewsByBookId(bookId);
+        List<Review> reviewEntities = reviewService.getReviewsByBookId(bookId);
 
         // Calculate average rating
         OptionalDouble averageRating = reviewEntities.stream()
-                .mapToInt(ReviewEntity::getRating)
+                .mapToInt(Review::getRating)
                 .average();
 
         // Prepare response with Gutendex data and review data
         return new BookReviewDto(
                 bookDtoDetails,
                 averageRating.isPresent() ? averageRating.getAsDouble() : null,
-                reviewEntities.stream().map(ReviewEntity::getReviewText).collect(Collectors.toList())
+                reviewEntities.stream().map(Review::getReviewText).collect(Collectors.toList())
         );
     }
 

@@ -2,7 +2,7 @@ package com.example.bookratingsystem;
 
 
 import com.example.bookratingsystem.controller.BookController;
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.*;
 import com.example.bookratingsystem.service.BookService;
 import com.example.bookratingsystem.service.ReviewService;
@@ -68,13 +68,13 @@ public class BookControllerTest {
       reviewDtoEntity.setBookId(1342);
       reviewDtoEntity.setRating(4);
       reviewDtoEntity.setReviewText("A wonderful and timeless story.");
-      ReviewEntity mockedReviewEntity = new ReviewEntity();
-      when(reviewService.addReview(any(ReviewDto.class))).thenReturn(mockedReviewEntity);
+      Review mockedReview = new Review();
+      when(reviewService.addReview(any(ReviewDto.class))).thenReturn(mockedReview);
 
       ResponseEntity<?> response = bookController.addReview(reviewDtoEntity);
 
     assertEquals(200, response.getStatusCodeValue());
-      assertEquals(mockedReviewEntity, response.getBody());
+      assertEquals(mockedReview, response.getBody());
   }
 
   @Test

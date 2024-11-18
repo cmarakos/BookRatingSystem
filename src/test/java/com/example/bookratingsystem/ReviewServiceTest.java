@@ -1,6 +1,6 @@
 package com.example.bookratingsystem;
 
-import com.example.bookratingsystem.model.ReviewEntity;
+import com.example.bookratingsystem.model.Review;
 import com.example.bookratingsystem.model.dto.BookIdRatingDto;
 import com.example.bookratingsystem.model.dto.MonthlyAverageRatingDto;
 import com.example.bookratingsystem.model.dto.ReviewDto;
@@ -36,22 +36,22 @@ public class ReviewServiceTest {
 
   @Test
   public void testAddReview() {
-    ReviewEntity reviewEntity = new ReviewEntity(1L, 1342, 4, "A wonderful and timeless story.", null);
+    Review review = new Review(1L, 1342, 4, "A wonderful and timeless story.", null);
     ReviewDto reviewDto = new ReviewDto(1342, 4, "A wonderful and timeless story.");
-    when(reviewRepository.save(any(ReviewEntity.class))).thenReturn(reviewEntity);
+    when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
-    ReviewEntity response = reviewService.addReview(reviewDto);
+    Review response = reviewService.addReview(reviewDto);
 
-    assertEquals(reviewEntity.getReviewText(), response.getReviewText());
+    assertEquals(review.getReviewText(), response.getReviewText());
   }
 
   @Test
   public void testGetReviewsByBookId() {
     int bookId = 1342;
-    List<ReviewEntity> mockReviewEntities = Collections.singletonList(new ReviewEntity(1L, bookId, 4, "A wonderful and timeless story.", null));
+    List<Review> mockReviewEntities = Collections.singletonList(new Review(1L, bookId, 4, "A wonderful and timeless story.", null));
     when(reviewRepository.findByBookId(bookId)).thenReturn(mockReviewEntities);
 
-    List<ReviewEntity> response = reviewService.getReviewsByBookId(bookId);
+    List<Review> response = reviewService.getReviewsByBookId(bookId);
 
     assertEquals(mockReviewEntities, response);
   }
